@@ -1,67 +1,50 @@
-Retire.js
-=========
+Command line scanner looking for use of known vulnerable js files and node modules in web projects and/or node projects.
 
-[![Retire Status](http://retire.insecurity.today/api/image?uri=https://raw.githubusercontent.com/RetireJS/retire.js/master/node/package.json)](http://retire.insecurity.today/api/image?uri=https://raw.githubusercontent.com/RetireJS/retire.js/master/node/package.json)
+Install
+-------
 
-#### What you require you must also retire
+    npm install -g retire
 
-There is a plethora of JavaScript libraries for use on the Web and in Node.JS apps out there. This greatly simplifies development,but we need to stay up-to-date on security fixes. "Using Components with Known Vulnerabilities" is now a part of the [OWASP Top 10](https://www.owasp.org/index.php/Top_10_2013-A9-Using_Components_with_Known_Vulnerabilities) list of security risks and insecure libraries can pose a huge risk to your Web app. The goal of Retire.js is to help you detect the use of JS-library versions with known vulnerabilities.
 
-Retire.js can be used in many ways:
+Usage
+-----
 
-1. [As  command line scanner](https://github.com/RetireJS/retire.js/tree/master/node)
-2. [As a grunt plugin](https://github.com/bekk/grunt-retire)
-2. [As a gulp task](#user-content-gulp-task)
-3. [As a Chrome extension](https://github.com/RetireJS/retire.js/tree/master/chrome)
-4. [As a Firefox extension](https://github.com/RetireJS/retire.js/tree/master/firefox)
-5. [As a Burp and OWASP Zap plugin](https://github.com/h3xstream/burp-retire-js)
+````
+Usage: retire [options]
 
-Command line scanner
---------------------
-Scan a web app or node app for use of vulnerable JavaScript libraries and/or Node.JS modules.
+Options:
 
-Grunt plugin
-------------
-A [Grunt task for running Retire.js](https://github.com/bekk/grunt-retire) as part of your application's build routine, or some other automated workflow.
+-h, --help              output usage information
+-V, --version           output the version number
 
-Gulp task
----------
-An example of a Gulp task which can be used in your gulpfile to watch and scan your project files automatically. You can modify the watch patterns and (optional) Retire.js options as you like.
+-p, --package           limit node scan to packages where parent is mentioned in package.json (ignore node_modules)
+-n, --node              Run node dependency scan only
+-j, --js                Run scan of JavaScript files only
+-v, --verbose           Show identified files (by default only vulnerable files are shown)
+-x, --dropexternal      Don't include project provided vulnerability repository
+-c, --nocache           Don't use local cache
 
-```javascript
-var gulp = require('gulp');
-var spawn = require('child_process').spawn;
-var gutil = require('gulp-util');
+--jspath <path>         Folder to scan for javascript files
+--nodepath <path>       Folder to scan for node files
+--path <path>           Folder to scan for both
+--jsrepo <path|url>     Local or internal version of repo
+--noderepo <path|url>   Local or internal version of repo
+--proxy <url>           Proxy url (http://some.sever:8080)
+--outputformat <format> Valid formats: text, json
+--outputpath <path>     File to which output should be written
+--ignore <paths>        Comma delimited list of paths to ignore
+--ignorefile <path>     Custom .retireignore file, defaults to .retireignore
+--exitwith <code>       Custom exit code (default: 13) when vulnerabilities are found
+````
 
-gulp.task('retire:watch', ['retire'], function (done) {
-    // Watch all javascript files and package.json
-    gulp.watch(['js/**/*.js', 'package.json'], ['retire']);
-});
-
-gulp.task('retire', function() {
-    // Spawn Retire.js as a child process
-    // You can optionally add option parameters to the second argument (array)
-    var child = spawn('retire', [], {cwd: process.cwd()});
-    
-    child.stdout.setEncoding('utf8');
-    child.stdout.on('data', function (data) {
-        gutil.log(data);
-    });
-
-    child.stderr.setEncoding('utf8');
-    child.stderr.on('data', function (data) {
-        gutil.log(gutil.colors.red(data));
-        gutil.beep();
-    });
-});
-
-```
-
-Chrome and firefox extensions 
+.retireignore 
 -------------
-Scans visited sites for references to insecure libraries, and puts warnings in the developer console. An icon on the address bar displays will also indicate if vulnerable libraries were loaded.
+````
+@qs                                                             # ignore this module regardless of location
+node_modules/connect/node_modules/body-parser/node_modules/qs   # ignore specific path
+````
+Due to a bug in ignore resolving, please upgrade to >= 1.1.3
 
-
-Burp and OWASP ZAP plugin
--------------------------
-[@h3xstream](https://github.com/h3xstream) has adapted Retire.js as a [plugin](https://github.com/h3xstream/burp-retire-js) for the penetration testing tools [Burp](http://portswigger.net/burp/) and [OWASP ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project). An alternative OWASP ZAP plugin exists at https://github.com/nikmmy/retire/
+Source code / Reporting an issue
+--------------------------------
+The source code and issue tracker can be found at [https://github.com/RetireJS/retire.js](https://github.com/RetireJS/retire.js)
